@@ -26,11 +26,11 @@ export default function ImageEditor({ imageData, onSave, onCancel, outputSize }:
 
   useEffect(() => {
     if (imageRef.current && !cropperRef.current) {
-      cropperRef.current = new Cropper(imageRef.current, {
+      const cropper = new Cropper(imageRef.current, {
         aspectRatio: 1, // Square crop
-        viewMode: 1,
+        viewMode: 0, // Allow image to move freely for unlimited zoom out
         dragMode: 'move',
-        autoCropArea: 0.8,
+        autoCropArea: 0.5, // Smaller initial crop for better view of large images
         restore: false,
         guides: true,
         center: true,
@@ -39,7 +39,29 @@ export default function ImageEditor({ imageData, onSave, onCancel, outputSize }:
         cropBoxResizable: true,
         toggleDragModeOnDblclick: false,
         background: true,
-      });
+        zoomable: true,
+        zoomOnWheel: true,
+        wheelZoomRatio: 0.1,
+        initialAspectRatio: 1,
+        ready() {
+          // Auto-fit large images (like scanned A4 at 300dpi)
+          const imageData = cropper.getImageData();
+          const containerData = cropper.getContainerData();
+
+          // Calculate zoom needed to fit entire image in viewport
+          const scaleX = containerData.width / imageData.naturalWidth;
+          const scaleY = containerData.height / imageData.naturalHeight;
+          const fitScale = Math.min(scaleX, scaleY) * 0.85; // 85% for padding
+
+          // Only zoom if image is larger than viewport
+          if (imageData.naturalWidth > containerData.width ||
+              imageData.naturalHeight > containerData.height) {
+            cropper.zoomTo(fitScale);
+          }
+        },
+      } as any); // Cast to bypass TypeScript limitations on zoom options
+
+      cropperRef.current = cropper;
     }
 
     return () => {
@@ -80,6 +102,20 @@ export default function ImageEditor({ imageData, onSave, onCancel, outputSize }:
   const handleReset = () => {
     cropperRef.current?.reset();
     setRotation(0);
+  };
+
+  const handleFitToView = () => {
+    if (!cropperRef.current) return;
+
+    const imageData = cropperRef.current.getImageData();
+    const containerData = cropperRef.current.getContainerData();
+
+    // Calculate zoom to fit entire image in viewport
+    const scaleX = containerData.width / imageData.naturalWidth;
+    const scaleY = containerData.height / imageData.naturalHeight;
+    const fitScale = Math.min(scaleX, scaleY) * 0.85;
+
+    cropperRef.current.zoomTo(fitScale);
   };
 
   const handleSave = () => {
@@ -159,6 +195,13 @@ export default function ImageEditor({ imageData, onSave, onCancel, outputSize }:
                 title="Zoom In"
               >
                 +
+              </button>
+              <button
+                onClick={handleFitToView}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                title="Fit entire image to view"
+              >
+                Fit to View
               </button>
               <span className="text-xs text-slate-500 ml-2">or use mouse wheel</span>
             </div>
