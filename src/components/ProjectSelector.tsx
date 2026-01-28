@@ -20,7 +20,7 @@ export default function ProjectSelector({ onProjectSelected }: ProjectSelectorPr
   // Load saved projects from localStorage on mount
   useEffect(() => {
     try {
-      const projects = JSON.parse(localStorage.getItem('sprite-tool-projects') || '[]');
+      const projects = JSON.parse(localStorage.getItem('elvisas-sprite-projects') || '[]');
       setSavedProjects(projects);
     } catch (error) {
       console.error('Failed to load projects:', error);
@@ -45,9 +45,9 @@ export default function ProjectSelector({ onProjectSelected }: ProjectSelectorPr
     e.stopPropagation();
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
-        const projects = JSON.parse(localStorage.getItem('sprite-tool-projects') || '[]');
+        const projects = JSON.parse(localStorage.getItem('elvisas-sprite-projects') || '[]');
         const filtered = projects.filter((p: Project) => p.id !== projectId);
-        localStorage.setItem('sprite-tool-projects', JSON.stringify(filtered));
+        localStorage.setItem('elvisas-sprite-projects', JSON.stringify(filtered));
         setSavedProjects(filtered);
       } catch (error) {
         console.error('Failed to delete project:', error);
@@ -92,7 +92,7 @@ export default function ProjectSelector({ onProjectSelected }: ProjectSelectorPr
               <div className="flex-1">
                 <h4 className="font-medium text-slate-800">{project.name}</h4>
                 <div className="flex items-center gap-4 mt-1 text-xs text-slate-500">
-                  <span>{project.animations.length} animation{project.animations.length !== 1 ? 's' : ''}</span>
+                  <span>{project.figures.length} figure{project.figures.length !== 1 ? 's' : ''}</span>
                   <span>•</span>
                   <span>Modified: {new Date(project.lastModified).toLocaleDateString()}</span>
                 </div>

@@ -4,6 +4,7 @@ import ProjectSelector from './components/ProjectSelector';
 import AnimationCreator from './components/AnimationCreator';
 import FrameGrid from './components/FrameGrid';
 import AnimationPreview from './components/AnimationPreview';
+import FigureAnimationsView from './components/FigureAnimationsView';
 
 /**
  * Main Application Component
@@ -12,8 +13,11 @@ import AnimationPreview from './components/AnimationPreview';
  * It manages the overall layout and conditional rendering based on project/animation state.
  */
 function App() {
-  const { currentProject, currentAnimation } = useProjectStore();
+  const { currentProject, currentFigure, currentAnimation, selectFigure, selectAnimation } = useProjectStore();
   const [showProjectSelector, setShowProjectSelector] = useState(true);
+  const [showProjectDropdown, setShowProjectDropdown] = useState(false);
+  const [showFigureDropdown, setShowFigureDropdown] = useState(false);
+  const [showAnimationDropdown, setShowAnimationDropdown] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -23,11 +27,8 @@ function App() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-slate-900">
-                Sprite Animation Tool
+                Elvisas Sprite Animation Tool
               </h1>
-              <p className="text-sm text-slate-500 mt-1">
-                {currentProject ? currentProject.name : 'No project loaded'}
-              </p>
             </div>
             <button
               onClick={() => setShowProjectSelector(!showProjectSelector)}
@@ -36,6 +37,127 @@ function App() {
               {showProjectSelector ? 'Hide Projects' : 'Manage Projects'}
             </button>
           </div>
+
+          {/* Navigation Bar */}
+          {currentProject && (
+            <div className="mt-4 flex items-center gap-2 text-sm">
+              {/* Project Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setShowProjectDropdown(!showProjectDropdown);
+                    setShowFigureDropdown(false);
+                    setShowAnimationDropdown(false);
+                  }}
+                  className="px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
+                >
+                  {currentProject.name}
+                  <span className="ml-1">▼</span>
+                </button>
+                {showProjectDropdown && currentProject.figures.length > 0 && (
+                  <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10 min-w-[200px]">
+                    <div className="p-2">
+                      <div className="text-xs font-medium text-slate-500 px-2 py-1">Figures in {currentProject.name}</div>
+                      {currentProject.figures.map((figure) => (
+                        <button
+                          key={figure.id}
+                          onClick={() => {
+                            selectFigure(figure.id);
+                            setShowProjectDropdown(false);
+                          }}
+                          className="w-full text-left px-3 py-2 hover:bg-slate-50 rounded transition-colors"
+                        >
+                          {figure.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Separator */}
+              {currentFigure && <span className="text-slate-400">›</span>}
+
+              {/* Figure Dropdown */}
+              {currentFigure && (
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setShowFigureDropdown(!showFigureDropdown);
+                      setShowProjectDropdown(false);
+                      setShowAnimationDropdown(false);
+                    }}
+                    className="px-3 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors font-medium"
+                  >
+                    {currentFigure.name}
+                    <span className="ml-1">▼</span>
+                  </button>
+                  {showFigureDropdown && currentProject.figures.length > 0 && (
+                    <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10 min-w-[200px]">
+                      <div className="p-2">
+                        <div className="text-xs font-medium text-slate-500 px-2 py-1">Switch Figure</div>
+                        {currentProject.figures.map((figure) => (
+                          <button
+                            key={figure.id}
+                            onClick={() => {
+                              selectFigure(figure.id);
+                              setShowFigureDropdown(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 hover:bg-slate-50 rounded transition-colors ${
+                              figure.id === currentFigure.id ? 'bg-purple-50 text-purple-700' : ''
+                            }`}
+                          >
+                            {figure.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Separator */}
+              {currentAnimation && <span className="text-slate-400">›</span>}
+
+              {/* Animation Dropdown */}
+              {currentAnimation && currentFigure && (
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setShowAnimationDropdown(!showAnimationDropdown);
+                      setShowProjectDropdown(false);
+                      setShowFigureDropdown(false);
+                    }}
+                    className="px-3 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors font-medium"
+                  >
+                    {currentAnimation.name}
+                    <span className="ml-1">▼</span>
+                  </button>
+                  {showAnimationDropdown && currentFigure.animations.length > 0 && (
+                    <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10 min-w-[200px]">
+                      <div className="p-2">
+                        <div className="text-xs font-medium text-slate-500 px-2 py-1">Switch Animation</div>
+                        {currentFigure.animations.map((anim) => (
+                          <button
+                            key={anim.id}
+                            onClick={() => {
+                              selectAnimation(anim.id);
+                              setShowAnimationDropdown(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 hover:bg-slate-50 rounded transition-colors ${
+                              anim.id === currentAnimation.id ? 'bg-green-50 text-green-700' : ''
+                            }`}
+                          >
+                            {anim.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
@@ -51,16 +173,16 @@ function App() {
         {/* Project Content */}
         {currentProject && (
           <div className="space-y-8">
-            {/* Animation Creator */}
+            {/* Figure and Animation Creator */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold text-slate-800 mb-4">
-                Create Animation
+                {currentFigure ? 'Create Animation' : 'Create Figure'}
               </h2>
               <AnimationCreator />
             </div>
 
             {/* Current Animation Workspace */}
-            {currentAnimation && (
+            {currentAnimation && currentFigure && (
               <>
                 {/* Animation Info */}
                 <div className="bg-white rounded-lg shadow-md p-6">
@@ -89,28 +211,13 @@ function App() {
               </>
             )}
 
-            {/* No Animation Selected State */}
-            {!currentAnimation && (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                <svg
-                  className="mx-auto h-12 w-12 text-slate-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
-                  />
-                </svg>
-                <h3 className="mt-2 text-sm font-medium text-slate-900">
-                  No animation selected
-                </h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  Create a new animation to get started
-                </p>
+            {/* Figure Animations Overview - Show all animations side-by-side */}
+            {currentFigure && !currentAnimation && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <FigureAnimationsView
+                  figure={currentFigure}
+                  onSelectAnimation={selectAnimation}
+                />
               </div>
             )}
           </div>

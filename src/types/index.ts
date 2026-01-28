@@ -20,17 +20,27 @@ export interface Animation {
   outputSize: number; // Output size in pixels (64, 128, 256, etc.)
 }
 
-// Represents a project (can contain multiple animations/figures)
+// Represents a figure/character (can contain multiple animations)
+export interface Figure {
+  id: string;
+  name: string;
+  animations: Animation[];
+  created: string;
+  lastModified: string;
+}
+
+// Represents a project (can contain multiple figures)
 export interface Project {
   id: string;
   name: string;
   created: string;
   lastModified: string;
-  animations: Animation[];
+  figures: Figure[];
 }
 
 // Export metadata structure
 export interface ExportMetadata {
+  figureName: string;
   animationName: string;
   frameCount: number;
   fps: number;

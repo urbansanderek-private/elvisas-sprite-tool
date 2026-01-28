@@ -1,15 +1,19 @@
-# Sprite Animation Tool
+# Elvisas Sprite Animation Tool
 
-A professional web-based tool for converting hand-drawn artwork into sprite animations for game development (e.g., SpriteKit).
+A professional web-based tool for converting hand-drawn artwork into sprite animations for game development (e.g., SpriteKit). Created for www.annasanderek.se.
 
 ## Features
 
+- **Hierarchical Organization**: Project → Figures → Animations → Frames
 - **Project Management**: Create and manage multiple sprite animation projects
-- **Frame-based Animation**: Add multiple animations per figure with configurable frame counts
-- **Image Processing**: Upload, edit, crop, and process images for each frame
-- **Background Removal**: Automatic background removal using AI (client-side)
+- **Figure-based Workflow**: Organize multiple figures/characters within each project
+- **Multiple Animations per Figure**: Add walking, jumping, idle animations and more
+- **Side-by-Side Comparison**: View all animations for a figure simultaneously to ensure consistent style
+- **Frame-based Animation**: Configurable frame counts for each animation
+- **Image Processing**: Upload images via drag & drop or file selection
+- **Persistent Navigation**: Always see your current context (Project › Figure › Animation)
 - **Live Preview**: Real-time animation preview with adjustable FPS
-- **Export**: Export animations as ZIP files with metadata
+- **localStorage Persistence**: All data saved automatically in browser
 
 ## Tech Stack
 
@@ -52,30 +56,45 @@ npm run preview
 
 ```
 src/
-├── components/          # React components
-│   ├── AnimationCreator.tsx
-│   ├── AnimationPreview.tsx
-│   ├── FrameCell.tsx
-│   ├── FrameGrid.tsx
-│   └── ProjectSelector.tsx
-├── store/              # State management
-│   └── projectStore.ts
-├── types/              # TypeScript types
-│   └── index.ts
-├── utils/              # Utility functions
-├── App.tsx             # Main app component
-├── main.tsx           # Entry point
-└── index.css          # Global styles
+├── components/               # React components
+│   ├── AnimationCreator.tsx  # Create figures and animations
+│   ├── AnimationPreview.tsx  # Single animation preview
+│   ├── FigureAnimationsView.tsx  # Side-by-side view of all animations
+│   ├── FrameCell.tsx         # Individual frame upload/edit
+│   ├── FrameGrid.tsx         # Grid of all frames
+│   └── ProjectSelector.tsx   # Project management
+├── store/                    # State management
+│   └── projectStore.ts       # Zustand store (Project → Figure → Animation)
+├── types/                    # TypeScript types
+│   └── index.ts              # Type definitions
+├── App.tsx                   # Main app with navigation
+├── main.tsx                  # Entry point
+└── index.css                 # Global styles
 ```
 
 ## Usage
 
-1. **Create a Project**: Start by creating a new project or loading an existing one
-2. **Create Animation**: Define animation name and frame count
-3. **Upload Frames**: Drag and drop or click to upload images for each frame
-4. **Process Images**: Use built-in tools to edit, crop, and remove backgrounds
-5. **Preview**: Watch your animation in the preview window
-6. **Export**: Download your animation as a ZIP file with all frames and metadata
+1. **Create a Project**: Start by creating a new project (e.g., "My Game Characters")
+2. **Create a Figure**: Add a figure/character to your project (e.g., "Player Character", "Enemy")
+3. **Create Animations**: Add animations for the figure (e.g., "walk_right", "jump", "idle")
+4. **Upload Frames**: Drag and drop or click to upload images for each frame
+5. **Side-by-Side View**: When not editing a specific animation, see all animations for a figure side-by-side
+6. **Preview**: Watch individual animations in the preview window with adjustable FPS
+7. **Switch Contexts**: Use the navigation bar to switch between projects, figures, and animations
+
+## Data Hierarchy
+
+```
+Project (e.g., "My Game")
+  └── Figure (e.g., "Player Character")
+       ├── Animation (e.g., "walk_right")
+       │    ├── Frame 1
+       │    ├── Frame 2
+       │    └── Frame 3
+       └── Animation (e.g., "jump")
+            ├── Frame 1
+            └── Frame 2
+```
 
 ## License
 
