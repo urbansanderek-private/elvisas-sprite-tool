@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useProjectStore } from '../store/projectStore';
+import { exportAnimationAsZip, getExportInfo } from '../utils/exportUtils';
 
 /**
  * AnimationPreview Component
@@ -8,10 +9,11 @@ import { useProjectStore } from '../store/projectStore';
  * Shows FPS controls and current frame information.
  */
 export default function AnimationPreview() {
-  const { currentAnimation, updateAnimation } = useProjectStore();
+  const { currentAnimation, currentFigure, updateAnimation } = useProjectStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentFrame, setCurrentFrame] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
   const animationFrameRef = useRef<number>();
   const lastFrameTimeRef = useRef<number>(0);
 
@@ -80,6 +82,21 @@ export default function AnimationPreview() {
   if (!currentAnimation) return null;
 
   const framesWithData = currentAnimation.frames.filter(f => f.imageData);
+  const exportInfo = getExportInfo(currentAnimation);
+
+  const handleExport = async () => {
+    if (!currentFigure || !exportInfo.hasFrames) return;
+
+    setIsExporting(true);
+    try {
+      await exportAnimationAsZip(currentAnimation, currentFigure.name);
+      alert('Animation exported successfully!');
+    } catch (error) {
+      alert(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -152,6 +169,34 @@ export default function AnimationPreview() {
           <option value={256}>256x256</option>
           <option value={512}>512x512</option>
         </select>
+      </div>
+
+      {/* Export Section */}
+      <div className="flex flex-col items-center gap-3 pt-4 border-t border-slate-200">
+        <button
+          onClick={handleExport}
+          disabled={!exportInfo.hasFrames || isExporting}
+          className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed shadow-md"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          {isExporting ? 'Exporting...' : 'Export as ZIP'}
+        </button>
+
+        {/* Export Info */}
+        {exportInfo.hasFrames && (
+          <div className="text-sm text-slate-600 text-center">
+            <div>{exportInfo.frameCount} frame{exportInfo.frameCount !== 1 ? 's' : ''}</div>
+            <div className="text-xs text-slate-500">Estimated size: {exportInfo.estimatedSize}</div>
+          </div>
+        )}
+
+        {!exportInfo.hasFrames && (
+          <div className="text-sm text-slate-400 text-center">
+            No frames to export
+          </div>
+        )}
       </div>
     </div>
   );
