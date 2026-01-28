@@ -110,12 +110,13 @@ export default function ImageEditor({ imageData, onSave, onCancel, outputSize }:
     const imageData = cropperRef.current.getImageData();
     const containerData = cropperRef.current.getContainerData();
 
-    // Calculate zoom to fit entire image in viewport
-    const scaleX = containerData.width / imageData.naturalWidth;
-    const scaleY = containerData.height / imageData.naturalHeight;
-    const fitScale = Math.min(scaleX, scaleY) * 0.85;
+    // Calculate what ratio we need to fit the natural image in the container
+    const targetRatioX = (containerData.width * 0.85) / imageData.naturalWidth;
+    const targetRatioY = (containerData.height * 0.85) / imageData.naturalHeight;
+    const targetRatio = Math.min(targetRatioX, targetRatioY);
 
-    cropperRef.current.zoomTo(fitScale);
+    // Apply the zoom
+    cropperRef.current.zoomTo(targetRatio);
   };
 
   const handleSave = () => {

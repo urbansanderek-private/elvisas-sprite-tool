@@ -16,7 +16,7 @@ interface FrameCellProps {
 }
 
 export default function FrameCell({ frame, frameNumber }: FrameCellProps) {
-  const { updateFrame, removeFrame, currentAnimation } = useProjectStore();
+  const { updateFrame, removeFrame, deleteFrame, currentAnimation } = useProjectStore();
   const [isDragging, setIsDragging] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
   const [editingImage, setEditingImage] = useState<string | null>(null);
@@ -108,8 +108,15 @@ export default function FrameCell({ frame, frameNumber }: FrameCellProps) {
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm('Remove this frame image?')) {
+    if (window.confirm('Clear this frame image?')) {
       removeFrame(frame.id);
+    }
+  };
+
+  const handleDeleteFrame = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm('Delete this frame from the animation? This will reduce the frame count.')) {
+      deleteFrame(frame.id);
     }
   };
 
@@ -191,11 +198,20 @@ export default function FrameCell({ frame, frameNumber }: FrameCellProps) {
                   </button>
                   <button
                     onClick={handleRemove}
+                    className="p-2 bg-white rounded-full shadow-lg hover:bg-yellow-50 transition-colors"
+                    title="Clear image (keep frame)"
+                  >
+                    <svg className="w-4 h-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleDeleteFrame}
                     className="p-2 bg-white rounded-full shadow-lg hover:bg-red-50 transition-colors"
-                    title="Remove image"
+                    title="Delete frame from animation"
                   >
                     <svg className="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
                 </div>

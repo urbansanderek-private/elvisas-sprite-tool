@@ -32,6 +32,8 @@ interface ProjectStore {
   // Frame actions
   updateFrame: (frameId: string, imageData: string) => void;
   removeFrame: (frameId: string) => void;
+  addFrame: () => void;
+  deleteFrame: (frameId: string) => void;
 
   // Helper methods
   saveToLocalStorage: () => void;
@@ -250,6 +252,44 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     );
 
     get().updateAnimation(currentAnimation.id, { frames: updatedFrames });
+  },
+
+  addFrame: () => {
+    const { currentAnimation } = get();
+    if (!currentAnimation) return;
+
+    const newFrame: Frame = {
+      id: `frame-${Date.now()}`,
+      imageData: null,
+      processed: false,
+    };
+
+    const updatedFrames = [...currentAnimation.frames, newFrame];
+    const updatedFrameCount = updatedFrames.length;
+
+    get().updateAnimation(currentAnimation.id, {
+      frames: updatedFrames,
+      frameCount: updatedFrameCount,
+    });
+  },
+
+  deleteFrame: (frameId: string) => {
+    const { currentAnimation } = get();
+    if (!currentAnimation) return;
+
+    // Don't allow deleting if only one frame left
+    if (currentAnimation.frames.length <= 1) {
+      alert('Cannot delete the last frame. Animation must have at least 1 frame.');
+      return;
+    }
+
+    const updatedFrames = currentAnimation.frames.filter(frame => frame.id !== frameId);
+    const updatedFrameCount = updatedFrames.length;
+
+    get().updateAnimation(currentAnimation.id, {
+      frames: updatedFrames,
+      frameCount: updatedFrameCount,
+    });
   },
 
   // ===== HELPER METHODS =====

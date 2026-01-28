@@ -8,7 +8,7 @@ import { useProjectStore } from '../store/projectStore';
  * Requires a current figure to create animations.
  */
 export default function AnimationCreator() {
-  const { createFigure, createAnimation, selectAnimation, currentProject, currentFigure } = useProjectStore();
+  const { createFigure, createAnimation, selectAnimation, deleteAnimation, currentProject, currentFigure } = useProjectStore();
   const [figureName, setFigureName] = useState('');
   const [animationName, setAnimationName] = useState('');
   const [frameCount, setFrameCount] = useState(8);
@@ -111,13 +111,28 @@ export default function AnimationCreator() {
               <h3 className="text-sm font-medium text-slate-600 mb-3">Animations in {currentFigure.name}:</h3>
               <div className="flex flex-wrap gap-2">
                 {currentFigure.animations.map((anim) => (
-                  <button
-                    key={anim.id}
-                    onClick={() => selectAnimation(anim.id)}
-                    className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors"
-                  >
-                    {anim.name} ({anim.frameCount} frames)
-                  </button>
+                  <div key={anim.id} className="relative group">
+                    <button
+                      onClick={() => selectAnimation(anim.id)}
+                      className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors pr-8"
+                    >
+                      {anim.name} ({anim.frameCount} frames)
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm(`Delete animation "${anim.name}"? This cannot be undone.`)) {
+                          deleteAnimation(anim.id);
+                        }
+                      }}
+                      className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Delete animation"
+                    >
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
